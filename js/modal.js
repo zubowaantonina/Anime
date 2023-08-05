@@ -7,14 +7,32 @@ const modal = () => {
     wrapper.style.width = '100%';
     wrapper.style.maxWidth = '500px';
 
-    const renderFunc = (items) => {
-        wrapper.innerHTML='';
+    //отложенный запрос
 
-     items.forEach(item => {
-        wrapper.insertAdjacentHTML('afterbegin', `
+
+
+    const debounce = (func, ms = 500) => {
+        let timer
+
+        return (...args) => {
+            // console.log('abc');
+            clearTimeout(timer);
+            timer = setTimeout(()=>{func.apply(this, args)}, ms)
+        }
+    }
+    const searchDebounce = debounce((searchString) => {
+        searchFunc(searchString);
+    }, 500)
+
+
+    const renderFunc = (items) => {
+        wrapper.innerHTML = '';
+
+        items.forEach(item => {
+            wrapper.insertAdjacentHTML('afterbegin', `
         <a href="/anime-details.html" target="_blank" class="pt-2">${item.title}</a>
         `)
-     })
+        })
     }
     const searchFunc = (searchStr) => {
         fetch("https://anime-in-javascript-default-rtdb.firebaseio.com/db.json").then((response) => {
@@ -44,7 +62,7 @@ const modal = () => {
         seachInput.value = '';
     });
     seachInput.addEventListener("input", (event) => {
-        searchFunc(event.target.value);
+        searchDebounce(event.target.value);
     });
 };
-modal();
+modal()
