@@ -1,4 +1,4 @@
-const mainData = () => {
+const categoriesData = () => {
     const preloder = document.querySelector(".preloder");
     const renderGanreList = (ganres) => {
 
@@ -12,19 +12,19 @@ const mainData = () => {
 
             `)
         })
-        console.log(dropDownBlock);
+        // console.log(dropDownBlock);
     }
     const renderAnimeList = (array, ganres) => {
         //выбор категории
-        const wrapper = document.querySelector(".product .col-lg-8");
+        const wrapper = document.querySelector(".product-page .col-lg-8");
 
-     
+
         //создание каталога жанров
         ganres.forEach((ganre) => {
             const productBlock = document.createElement('div');
             const listBlock = document.createElement('div');
-            
-            const list = array.filter(item => item.ganre === ganre);//фильтрация карточек из базы данных по жанрам
+
+            const list = array.filter(item => item.tags.includes(ganre));//фильтрация карточек из базы данных по жанрам
 
             listBlock.classList.add('row')
             productBlock.classList.add('mb-5')
@@ -42,16 +42,16 @@ const mainData = () => {
                 </div>
             </div>
         `)
-        list.forEach(item => {
-            const tagsBlock = document.createElement('ul')
+            list.forEach(item => {
+                const tagsBlock = document.createElement('ul')
 
-            item.tags.forEach(tag => {
-                tagsBlock.insertAdjacentHTML('beforeend', `
+                item.tags.forEach(tag => {
+                    tagsBlock.insertAdjacentHTML('beforeend', `
                 <li>${tag}</li>
                 `)
-            })
+                })
 
-            listBlock.insertAdjacentHTML('beforeend', `
+                listBlock.insertAdjacentHTML('beforeend', `
                 <div class="col-lg-4 col-md-6 col-sm-6">
                     <div class="product__item">
                         <div class="product__item__pic set-bg" data-setbg="${item.image}">
@@ -65,17 +65,14 @@ const mainData = () => {
                     </div>
                 </div>
             `)
-        })
-        productBlock.append(listBlock)
-        wrapper.append(productBlock);
+            })
+            productBlock.append(listBlock)
+            wrapper.append(productBlock);
 
-        wrapper.querySelectorAll(".set-bg").forEach((elem) => {
-            elem.style.backgroundImage = `url(${elem.dataset.setbg})`;
-        });
-        setTimeout(() => {
-            preloder.classList.remove('active')
-        }, 500)
-    })
+            wrapper.querySelectorAll(".set-bg").forEach((elem) => {
+                elem.style.backgroundImage = `url(${elem.dataset.setbg})`;
+            });
+        })
     };
     //создание topAnime из базы данных
     const renderTopAnime = (array) => {
@@ -97,22 +94,34 @@ const mainData = () => {
             );
         });
         wrapper.querySelectorAll(".set-bg").forEach((elem) => {
-            console.log(elem);
+            // console.log(elem);
             elem.style.backgroundImage = `url(${elem.dataset.setbg})`;
         });
+        setTimeout(() => {
+            preloder.classList.remove('active')
+        }, 500)
     };
     // console.log('mainadata');
     fetch("https://anime-in-js-default-rtdb.firebaseio.com/anime.json")
         .then((response) => response.json())
         .then((data) => {
             const ganres = new Set();
+            const ganreParams = new URLSearchParams(window.location.search).get('ganre')
+
+            console.log(ganreParams);
             data.forEach((item) => {
                 ganres.add(item.ganre);
             });
             // console.log(ganres);
             renderTopAnime(data.sort((a, b) => b.views - a.views).slice(0, 5));
-            renderAnimeList(data, ganres);
+            if (ganreParams) {
+                renderAnimeList(data, [ganreParams]);
+            } else {
+                renderAnimeList(data, ganres);
+            }
+
+            // renderAnimeList(data, ganres);
             renderGanreList(ganres)
         });
-};
-mainData();
+}
+categoriesData()
