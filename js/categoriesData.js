@@ -108,7 +108,7 @@ const categoriesData = () => {
             const ganres = new Set();
             const ganreParams = new URLSearchParams(window.location.search).get('ganre')
 
-            console.log(ganreParams);
+            // console.log(ganreParams);
             data.forEach((item) => {
                 ganres.add(item.ganre);
             });
